@@ -47,7 +47,7 @@ async function run() {
 
 
   //payment transetion api ................................ 
-  app.post('/create-payment-intent', async(req, res) =>{
+  app.post('/create-payment-intent',verifyToken, async(req, res) =>{
     const service = req.body;
    console.log(service)
     const price = service.price;
