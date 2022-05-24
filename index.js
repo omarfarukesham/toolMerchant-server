@@ -49,7 +49,9 @@ async function run() {
   //payment transetion api ................................ 
   app.post('/create-payment-intent', async(req, res) =>{
     const service = req.body;
+   
     const price = service.price;
+    console.log(price)
     const amount = price*100;
     const paymentIntent = await stripe.paymentIntents.create({
       amount : amount,
@@ -62,7 +64,9 @@ async function run() {
   //payment update of booking field.................................
   app.patch('/order/:id', async(req, res) =>{
     const id  = req.params.id;
+    console.log('iside patch', id)
     const payment = req.body;
+    console.log('iside patch payment', payment)
     const filter = {_id: ObjectId(id)};
     const updatedDoc = {
       $set: {
@@ -75,8 +79,6 @@ async function run() {
     const updatedBooking = await orderCollection.updateOne(filter, updatedDoc);
     res.send(updatedBooking);
   })
-
-
 
     //get product data from mongodb ...........
     app.get('/products', async (req, res) => {
