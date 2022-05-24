@@ -122,7 +122,7 @@ async function run() {
       res.send(order)
     })
 
-    app.get('/orders', async (req, res) => {
+    app.get('/productOrder', async (req, res) => {
       const query = {}
       const order = await orderCollection.find(query).toArray()
       res.send(order)
@@ -205,17 +205,7 @@ async function run() {
       };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result)
-
-      // if (requesterAccount.role === 'admin') {
-      //   const filter = { email: email };
-      //   const updateDoc = {
-      //     $set: { role: 'admin' }
-      //   };
-      //   const result = await userCollection.updateOne(filter, updateDoc);
-      //   res.send(result)
-      // } else {
-      //   res.status(403).send({ messages: 'Forbidden Access' })
-      // }
+ 
     })
 
 
