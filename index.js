@@ -52,7 +52,7 @@ async function run() {
   //  console.log(service)
     const price = service.price;
     // console.log(price)
-    const amount = price*100;
+    const amount = parseInt(price*100);
     const paymentIntent = await stripe.paymentIntents.create({
       amount : amount,
       currency: 'usd',
@@ -87,6 +87,7 @@ async function run() {
       res.send(result)
     })
 
+    //fake api for changing heroku...........
     app.post('/products', async (req, res) => {
       const product = req.body
       const result = await productCollection.insertOne(product)
