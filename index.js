@@ -49,7 +49,7 @@ async function run() {
   //payment transetion api ................................ 
   app.post('/create-payment-intent', async(req, res) =>{
     const service = req.body;
-   
+   console.log(service)
     const price = service.price;
     console.log(price)
     const amount = price*100;
@@ -134,11 +134,17 @@ async function run() {
       const result = await orderCollection.find(query).toArray()
       res.send(result)
     })
-
+//order checking with id ...............................
     app.delete('/order/:id', async (req, res) => {
       var id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
+      res.send(result)
+    })
+
+    app.get('/orders', async(req, res)=>{
+      const query = {}
+      const result = await userOrder.find(query).toArray()
       res.send(result)
     })
 
