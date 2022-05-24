@@ -3,6 +3,7 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const stripe = require('stripe')(process.env.ACCESS_PAYMENT_KEY);
 require('dotenv').config();
 const port = process.env.PORT || 4000;
 
@@ -41,6 +42,41 @@ async function run() {
     const userCollection = client.db('toolMerchant').collection('users')
     const orderCollection = client.db('toolMerchant').collection('orders')
     const profileCollection = client.db('toolMerchant').collection('profiles')
+    const paymentCollection = client.db('toolMerchant').collection('payments')
+
+
+
+  //payment transetion api ................................ 
+  app.post('/create-payment-intent', async(req, res) =>{
+    const service = req.body;
+    const price = service.price;
+    const amount = price*100;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount : amount,
+      currency: 'usd',
+      payment_method_types:['card']
+    });
+    res.send({clientSecret: paymentIntent.client_secret})
+  });
+
+  //payment update of booking field.................................
+  app.patch('/order/:id', async(req, res) =>{
+    const id  = req.params.id;
+    const payment = req.body;
+    const filter = {_id: ObjectId(id)};
+    const updatedDoc = {
+      $set: {
+        paid: true,
+        transactionId: payment.transactionId
+      }
+    }
+
+    const result = await paymentCollection.insertOne(payment);
+    const updatedBooking = await orderCollection.updateOne(filter, updatedDoc);
+    res.send(updatedBooking);
+  })
+
+
 
     //get product data from mongodb ...........
     app.get('/products', async (req, res) => {
