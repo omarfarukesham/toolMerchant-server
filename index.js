@@ -20,7 +20,7 @@ console.log('db connected')
 
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
-  console.log(authHeader);
+  // console.log(authHeader);
   if (!authHeader) {
     return res.status(401).send({ message: 'Unauthorized access' })
   }
@@ -48,12 +48,12 @@ async function run() {
 
 
   //payment transetion api ................................ 
-  app.post('/create-payment-intent', async(req, res) =>{
+  app.post('/create-payment-intent',verifyToken, async(req, res) =>{
 
     const service = req.body;
-   console.log(service)
+  //  console.log(service)
     const price = service.price;
-    console.log(price)
+    // console.log(price)
     const amount = parseInt(price)*100;
     const paymentIntent = await stripe.paymentIntents.create({
       amount : amount,
@@ -66,9 +66,9 @@ async function run() {
   //payment update of booking field.................................
   app.patch('/order/:id', async(req, res) =>{
     const id  = req.params.id;
-    console.log('iside patch', id)
+    // console.log('iside patch', id)
     const payment = req.body;
-    console.log('iside patch payment', payment)
+    // console.log('iside patch payment', payment)
     const filter = {_id: ObjectId(id)};
     const updatedDoc = {
       $set: {
@@ -97,7 +97,7 @@ async function run() {
     })
 
     //review post api here...............................................
-    app.post('/review', async (req, res) => {
+    app.post('/review', verifyToken, async (req, res) => {
       const review = req.body
       const result = await reviewCollection.insertOne(review)
       res.send(result)
@@ -169,7 +169,7 @@ async function run() {
     })
 
     //profile insert query here.......................................................
-    app.post('/profile', async (req, res) => {
+    app.post('/profile', verifyToken, async (req, res) => {
       const profileInfo = req.body;
       const result = await profileCollection.insertOne(profileInfo)
       return res.send(result)
@@ -252,10 +252,6 @@ run().catch(console.dir)
 
 
 
-
-
-
-
 //initial api caller......................................................................
 app.get('/', (req, res) => {
   res.send('Node js is ready to work...........')
@@ -266,16 +262,3 @@ app.listen(port, () => {
   console.log('toolMerchant Server running on the PORT::', port)
 })
 
-// verify function for jwt.........................................................
-function verifyToken(token) {
-  let email;
-  jwt.verify(token, process.env.ACCESS_TOKEN_KEY, function (error, decoded) {
-    if (error) {
-      email = 'Invalid email Address'
-    }
-    if (decoded) {
-      email = decoded
-    }
-  });
-  return email;
-}
