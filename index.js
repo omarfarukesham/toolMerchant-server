@@ -43,16 +43,18 @@ async function run() {
     const orderCollection = client.db('toolMerchant').collection('orders')
     const profileCollection = client.db('toolMerchant').collection('profiles')
     const paymentCollection = client.db('toolMerchant').collection('payments')
+    const reviewCollection = client.db('toolMerchant').collection('reviews')
 
 
 
   //payment transetion api ................................ 
-  app.post('/create-payment-intent',verifyToken, async(req, res) =>{
+  app.post('/create-payment-intent', async(req, res) =>{
+
     const service = req.body;
-  //  console.log(service)
+   console.log(service)
     const price = service.price;
-    // console.log(price)
-    const amount = parseInt(price*100);
+    console.log(price)
+    const amount = parseInt(price)*100;
     const paymentIntent = await stripe.paymentIntents.create({
       amount : amount,
       currency: 'usd',
@@ -93,6 +95,22 @@ async function run() {
       const result = await productCollection.insertOne(product)
       res.send(result)
     })
+
+    //review post api here...............................................
+    app.post('/review', async (req, res) => {
+      const review = req.body
+      const result = await reviewCollection.insertOne(review)
+      res.send(result)
+    })
+
+    //review get api  for ui..................................
+
+    app.get('/review', async(req, res)=>{
+      const query = {}
+      const result = await reviewCollection.find(query).toArray()
+      res.send(result)
+    })
+
     //delete from database and client side ..................................
     app.delete('/product/:id', async (req, res) => {
       var id = req.params.id;
@@ -145,7 +163,8 @@ async function run() {
 
     app.get('/orders', async(req, res)=>{
       const query = {}
-      const result = await userOrder.find(query).toArray()
+      const result = await orderCollection.find(query).toArray()
+    
       res.send(result)
     })
 
@@ -158,7 +177,7 @@ async function run() {
 
     app.put('/profile/:email', async (req, res) => {
       const email = req.params.email
-      console.log(email)
+    
       const filter = { email: email };
       const user = req.body
       const options = { upsert: true };
@@ -213,7 +232,7 @@ async function run() {
     // rest api for insert new user or update user info when they will login or sign Up from UI.........
     app.put('/user/:email', async (req, res) => {
       const email = req.params.email
-      console.log(email)
+     
       const filter = { email: email };
       const user = req.body
       const options = { upsert: true };
